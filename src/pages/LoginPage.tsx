@@ -6,7 +6,7 @@ import { SetupBanner } from "../components/SetupBanner";
 import { useAuth } from "../lib/auth";
 
 export function LoginPage() {
-  const { user, loading, signIn } = useAuth();
+  const { user, loading, signIn, signInWithGoogle } = useAuth();
   const location = useLocation();
   const from = (location.state as { from?: string } | null)?.from ?? "/";
 
@@ -36,6 +36,14 @@ export function LoginPage() {
     if (result.error) setError(result.error);
   }
 
+  async function onGoogleSignIn() {
+    setError(null);
+    setSubmitting(true);
+    const result = await signInWithGoogle();
+    setSubmitting(false);
+    if (result.error) setError(result.error);
+  }
+
   return (
     <AuthShell title="Sign in" subtitle="Use the same email you registered with Supabase Auth.">
       <form className="grid gap-4" onSubmit={(event) => void onSubmit(event)} noValidate>
@@ -44,6 +52,11 @@ export function LoginPage() {
             {error}
           </p>
         ) : null}
+        <Button type="button" variant="secondary" disabled={submitting || loading} onClick={() => void onGoogleSignIn()}>
+          <span aria-hidden="true" className="font-semibold text-[#4285f4]">G</span>
+          Continue with Google
+        </Button>
+        <p className="text-center text-xs text-ink-muted">or continue with email</p>
         <TextField
           label="Email"
           name="email"

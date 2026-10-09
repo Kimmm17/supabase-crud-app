@@ -6,7 +6,7 @@ import { useAuth } from "../lib/auth";
 import { AuthShell } from "./LoginPage";
 
 export function SignupPage() {
-  const { user, loading, signUp } = useAuth();
+  const { user, loading, signUp, signInWithGoogle } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -46,6 +46,14 @@ export function SignupPage() {
     }
   }
 
+  async function onGoogleSignIn() {
+    setError(null);
+    setSubmitting(true);
+    const result = await signInWithGoogle();
+    setSubmitting(false);
+    if (result.error) setError(result.error);
+  }
+
   return (
     <AuthShell title="Create account" subtitle="New users are stored in Supabase Auth. Tasks stay private via RLS.">
       <form className="grid gap-4" onSubmit={(event) => void onSubmit(event)} noValidate>
@@ -59,6 +67,11 @@ export function SignupPage() {
             {info}
           </p>
         ) : null}
+        <Button type="button" variant="secondary" disabled={submitting || loading} onClick={() => void onGoogleSignIn()}>
+          <span aria-hidden="true" className="font-semibold text-[#4285f4]">G</span>
+          Continue with Google
+        </Button>
+        <p className="text-center text-xs text-ink-muted">or create an account with email</p>
         <TextField
           label="Email"
           name="email"
